@@ -25,6 +25,65 @@ app.get("/api/hello", function (req, res) {
 });
 
 
+app.get("/api/:date?", function(req, res) {
+
+  let date_object = new Date();
+
+  if(req.params.date === undefined)
+  {
+    let unix = date_object.getTime();
+    let utc = date_object.toUTCString();
+
+    // Returns current date, if route parameter is empty
+    res.json({
+      'unix': unix,
+      'utc': utc
+    });
+  }
+  else
+  {
+
+    let is_invalid = false;
+
+    // Checks if the date as string is invalid
+    date_object = new Date(req.params.date);
+    if(date_object == 'Invalid Date')
+    {
+      is_invalid = true;
+
+      // Checks if the date as number is invalid
+      date_object = new Date(Number(req.params.date));
+      if(date_object == 'Invalid Date')
+      {
+        is_invalid = true;
+      }
+      else
+      {
+        is_invalid = false;
+      }
+    }
+
+    if(is_invalid)
+    {
+      // Returns error
+      res.json({
+        'error': 'Invalid Date'
+      });
+    }
+    else
+    {
+      let unix = date_object.getTime();
+      let utc = date_object.toUTCString();
+
+      // Returns unix and json
+      res.json({
+        'unix': unix,
+        'utc': utc
+      });
+    }
+  }
+
+});
 
 // Listen on port set in environment variable or default to 3000
 var listener = app.listen(process.env.PORT || 3000, function () {
